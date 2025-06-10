@@ -2,4 +2,5 @@
 .vscode
 logs
 __pycache__
-data
+markdown_files
+pdf_files
