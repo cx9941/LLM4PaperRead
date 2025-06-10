@@ -1,0 +1,7 @@
+crew
+langchain_openai
+arxiv
+requests
+tqdm
+pandas
+marker-pdf

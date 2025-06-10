@@ -1,0 +1,30 @@
+research_task:
+  description: >
+    阅读论文《{title}》，论文内容如下：{content}，分析其研究动机、核心方法与公式推导细节。请结合摘要与正文信息，提取论文背景、问题定义、方法核心流程与理论基础。
+  expected_output: >
+    一份详细的技术提炼说明，包括：研究动机、方法原理、关键公式、创新点（中文描述）
+  agent: researcher
+
+review_task:
+  description: >
+    审稿视角评估论文《{title}》，指出其亮点与不足，覆盖方法合理性、实验设计、贡献大小与适用范围等方面。
+  expected_output: >
+    一份结构化中文评审意见，包含：优点分析、存在的问题、改进建议与最终评估意见（是否推荐接收）
+  context:
+    - research_task
+  agent: reviewer
+
+reporting_task:
+  description: >
+    整合前述研究内容与评审内容，撰写面向公众的论文解读报告（中文），类似机器之心或PaperWeekly风格，要求逻辑清晰、条理明确、结构如下：
+    1. 研究背景与动机
+    2. 方法简介（包括公式与结构图解析）
+    3. 实验设计与主要结果
+    4. 亮点评价与不足分析
+    5. 总体评价与启示
+  context:
+    - research_task
+    - review_task
+  expected_output: >
+    一份结构完整的markdown中文报告
+  agent: reporting_analyst
