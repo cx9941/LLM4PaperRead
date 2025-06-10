@@ -16,16 +16,17 @@ pip install requirement.txt
 
 To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
 
-爬取数据需要运行
+To crawl papers, you need to run
 ```
 python paper_crawler/semantic_crawler.py
 python paper_crawler/arxiv_crawler.py
 ```
 
-然后进一步进行论文阅读
+Then read the paper further
 ```
 python paper_read/src/paper_read/main.py
 ```
+
 This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
 
 ## Support
