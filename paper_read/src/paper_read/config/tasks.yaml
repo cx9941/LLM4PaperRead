@@ -26,5 +26,5 @@ reporting_task:
     - research_task
     - review_task
   expected_output: >
-    一份结构完整的markdown中文报告
+    一份结构完整的markdown中文报告，不需要额外的```markdown提示
   agent: reporting_analyst
