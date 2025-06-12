@@ -9,13 +9,76 @@ import json
 from marker.converters.pdf import PdfConverter
 from marker.models import create_model_dict
 from marker.output import text_from_rendered
+from bs4 import BeautifulSoup
 
 # 初始化 Marker 转换器
 converter = PdfConverter(artifact_dict=create_model_dict())
 sch = SemanticScholar()
 
-def safe_filename(text, max_length=50):
+def safe_filename(text, max_length=100):
     return "".join(c if c.isalnum() or c in ("_", "-") else "_" for c in text[:max_length])
+
+def fetch_doi_pdf_url(doi_url):
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
+
+    # 第一步：获取跳转后的页面
+    try:
+        response = requests.get(doi_url, headers=headers, allow_redirects=True, timeout=10)
+        final_url = response.url
+        print("跳转后URL：", final_url)
+    except requests.exceptions.RequestException as e:
+        print("请求失败：", e)
+        return None
+
+    # 第二步：尝试从最终页面中解析 PDF 链接
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    # 常见PDF链接关键词
+    pdf_keywords = ["pdf", ".pdf", "fulltext", "download"]
+    for a_tag in soup.find_all("a", href=True):
+        href = a_tag["href"]
+        if any(k in href.lower() for k in pdf_keywords):
+            if href.startswith("/"):
+                href = final_url.rstrip("/") + href
+            elif href.startswith("http"):
+                pass
+            else:
+                href = final_url.rstrip("/") + "/" + href
+            print("发现可能的PDF链接：", href)
+            return href
+    return None
+
+def fetch_url(result, pdf_filepath, md_filepath):
+    if "ArXiv" in result.externalIds:
+        arxiv_id = result.externalIds["ArXiv"]
+        pdf_url = f"https://arxiv.org/pdf/{arxiv_id}.pdf"
+    elif "DOI" in result.externalIds:
+        doi_id = result.externalIds["DOI"]
+        doi_url = f"https://doi.org/{doi_id}"
+        pdf_url = fetch_doi_pdf_url(doi_url)
+    else:
+        pdf_url = result._openAccessPdf['url']
+        
+    try:
+        if not os.path.exists(pdf_filepath):
+            pdf_response = requests.get(pdf_url)
+            with open(pdf_filepath, "wb") as f:
+                f.write(pdf_response.content)
+
+        if not os.path.exists(md_filepath):
+            rendered = converter(pdf_filepath)
+            text, _, _ = text_from_rendered(rendered)
+            with open(md_filepath, "w", encoding="utf-8") as w:
+                w.write(text)
+    except Exception as e:
+        print(f'PDF {pdf_url}, doanload Error:', e)
+        pdf_url = None
+
+    return pdf_url
+
+
 
 def process_query(query, max_results, base_dir):
     query_time = datetime.now().strftime("%Y-%m-%d")
@@ -54,29 +117,12 @@ def process_query(query, max_results, base_dir):
             except Exception as e:
                 publication_date = str(result._year)
             abstract = result.abstract
-            arxiv_id = result.externalIds["ArXiv"] if "ArXiv" in result.externalIds else None
-            pdf_url = f"https://arxiv.org/pdf/{arxiv_id}.pdf" if arxiv_id else ""
-            pdf_url = result._openAccessPdf['url'] if result._openAccessPdf['url'] != "" else pdf_url
-
             safe_title = safe_filename(title)
             pdf_filename = f"{publication_date}_{safe_title}.pdf"
             md_filename = pdf_filename.replace(".pdf", ".md")
             pdf_filepath = os.path.join(pdf_dir, pdf_filename)
             md_filepath = os.path.join(md_dir, md_filename)
-
-            # 下载 PDF（如有 arXiv 链接）
-            if arxiv_id:
-                if not os.path.exists(pdf_filepath):
-                    pdf_response = requests.get(pdf_url)
-                    with open(pdf_filepath, "wb") as f:
-                        f.write(pdf_response.content)
-
-                if not os.path.exists(md_filepath):
-                    rendered = converter(pdf_filepath)
-                    text, _, _ = text_from_rendered(rendered)
-                    with open(md_filepath, "w", encoding="utf-8") as w:
-                        w.write(text)
-
+            pdf_url = fetch_url(result, pdf_filepath, md_filepath)
             record = {
                 "query_date": query_time,
                 "query_keyword": query,
@@ -89,8 +135,8 @@ def process_query(query, max_results, base_dir):
                 "influential_citation_count": influentialCitationCount,
                 "abstract": abstract,
                 "pdf_url": pdf_url,
-                "pdf_filename": pdf_filename if arxiv_id else "",
-                "markdown_path": md_filepath if arxiv_id else ""
+                "pdf_filepath": pdf_filepath if pdf_url is not None else "",
+                "markdown_path": md_filepath if pdf_url is not None else ""
             }
             records.append(record)
 
@@ -100,6 +146,7 @@ def process_query(query, max_results, base_dir):
     # 保存元数据
     if records:
         df = pd.DataFrame(records).drop(['abstract'], axis=1)
+        df = df[df['pdf_url'].apply(len) > 1]
         if os.path.exists(meta_path):
             df.to_csv(meta_path, mode='a', header=False, index=False)
         else:
