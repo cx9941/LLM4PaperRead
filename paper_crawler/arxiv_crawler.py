@@ -34,7 +34,7 @@ def process_query(query, max_results, base_dir):
     records = []
 
     if os.path.exists(meta_path):
-        paper_id_list = pd.read_csv(meta_path)['arxiv_id'].tolist()
+        paper_id_list = pd.read_csv(meta_path)['paper_id'].tolist()
     else:
         paper_id_list = []
 
@@ -77,7 +77,7 @@ def process_query(query, max_results, base_dir):
             record = {
                 "query_date": query_time,
                 "query_keyword": query,
-                "arxiv_id": paper_id,
+                "paper_id": paper_id,
                 "publication_date": result.published.strftime("%Y-%m-%d"),
                 "updated_date": result.updated.strftime("%Y-%m-%d"),
                 "title": title,

@@ -24,7 +24,7 @@ MARKDOWN_DIRS = {
 def parse_arguments():
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(description="Process research papers")
-    parser.add_argument('--type', choices=['arxiv', 'semantic'], default='arxiv',
+    parser.add_argument('--type', choices=['arxiv', 'semantic'], default='semantic',
                        help="Type of papers to process (arxiv or semantic)")
     parser.add_argument('--keyword', default='Multi-Agent LLM',
                        help="Keyword to filter papers (e.g., 'Multi-Agent LLM')")
@@ -47,7 +47,9 @@ def get_processed_papers(output_dir):
 
 def process_paper(row, paper_type, force_process=False):
     """Process a single paper"""
-    paper_id = f"{paper_type}_{row['arxiv_id'].replace('/', '_')}" if paper_type == 'arxiv' else f"{paper_type}_{row['paper_id']}"
+    if row['markdown_path'] is None or type(row['markdown_path']) != type(''):
+        return
+    paper_id = f"{paper_type}_{row['paper_id'].replace('/', '_')}" if paper_type == 'arxiv' else f"{paper_type}_{row['paper_id']}"
     output_filename = row['markdown_path'].replace('data', 'outputs').replace('markdown_files', 'log_files').replace('md', 'json')
     report_file = row['markdown_path'].replace('data', 'outputs').replace('markdown_files', 'report_files')
     
@@ -79,7 +81,8 @@ def process_paper(row, paper_type, force_process=False):
         'paper_id': paper_id,
         'authors': row['authors'],
         'publication_date': row['publication_date'],
-        'source': paper_type
+        'source': paper_type,
+        'venue': row['venue'],
     }
     
     # Process the paper
@@ -108,6 +111,11 @@ def run():
         # Load metadata
         df = pd.read_csv(META_PATHS[args.type])
         
+        if args.type == 'semantic':
+            df = df.sort_values('citation_count', ascending=False)
+        else:
+            df = df.sort_values('publication_date', ascending=False)
+        
         # Filter by keyword
         keyword_filter = df['query_keyword'] == args.keyword
         filtered_df = df[keyword_filter]
@@ -122,7 +130,7 @@ def run():
         processed_papers = set() if args.force else get_processed_papers(output_dir)
         
         for _, row in filtered_df.iterrows():
-            paper_id = f"{args.type}_{row['arxiv_id'].replace('/', '_')}" if args.type == 'arxiv' else f"{args.type}_{row['paper_id']}"
+            paper_id = f"{args.type}_{row['paper_id'].replace('/', '_')}" if args.type == 'arxiv' else f"{args.type}_{row['paper_id']}"
             if paper_id not in processed_papers:
                 process_paper(row, args.type, args.force)
             
