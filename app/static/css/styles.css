@@ -1,0 +1,182 @@
+/* Base styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f7fa;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+}
+
+/* Option cards */
+.options {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.option-card {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    width: 300px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.option-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.option-card h2 {
+    color: #3498db;
+    margin-top: 0;
+}
+
+.option-card p {
+    color: #7f8c8d;
+}
+
+/* Paper reading view styles */
+.back-link {
+    display: inline-block;
+    margin-top: 1rem;
+    color: #3498db;
+    text-decoration: none;
+}
+
+.search-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.search-container input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.search-container button {
+    padding: 0.75rem 1.5rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.content-area {
+    display: flex;
+    gap: 2rem;
+}
+
+.paper-list {
+    width: 300px;
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.paper-viewer {
+    flex: 1;
+    display: flex;
+    gap: 1rem;
+}
+
+.pdf-viewer, 
+.summary-viewer {
+    flex: 1;
+    height: 80vh;
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: auto;
+}
+
+/* Enhanced PDF viewer styling */
+.pdf-viewer iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 600px;
+}
+
+/* Markdown content styling */
+.summary-viewer h1,
+.summary-viewer h2, 
+.summary-viewer h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.summary-viewer p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.summary-viewer pre {
+    background: #f5f7fa;
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+.summary-viewer code {
+    font-family: monospace;
+    background: #f5f7fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+}
+
+.summary-viewer blockquote {
+    border-left: 4px solid #3498db;
+    padding-left: 1rem;
+    margin-left: 0;
+    color: #7f8c8d;
+}
+
+.summary-viewer table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.summary-viewer th, 
+.summary-viewer td {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+}
+
+.summary-viewer img {
+    max-width: 100%;
+    height: auto;
+}

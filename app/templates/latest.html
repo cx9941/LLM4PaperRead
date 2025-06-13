@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latest Papers | Paper Daily</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Latest Papers</h1>
+            <p>Discover newest research from arXiv</p>
+            <a href="/" class="back-link">← Back to Home</a>
+        </header>
+
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search for papers...">
+            <button id="search-btn">Search</button>
+            <button id="crawl-btn">Crawl Papers</button>
+            <button id="read-btn">Read Papers</button>
+        </div>
+
+        <div class="content-area">
+            <div class="paper-list" id="paper-list">
+                <!-- Papers will be populated here -->
+            </div>
+            <div class="paper-viewer">
+                <div class="pdf-viewer" id="pdf-viewer">
+                    <!-- PDF will be displayed here -->
+                    <p>Select a paper to view</p>
+                </div>
+                <div class="summary-viewer" id="summary-viewer">
+                    <!-- Markdown summary will be displayed here -->
+                    <p>Paper summary will appear here</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/latest.js"></script>
+</body>
+</html>
