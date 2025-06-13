@@ -112,7 +112,7 @@ def process_query(query, max_results, base_dir):
             json.dump(item, f)
             f.write('\n')
 
-def main():
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", type=str, default="file", choices=["file", "inline"], help="关键词模式")
     parser.add_argument("--keywords_file", type=str, help="关键词文件路径（mode=file）", default="input.txt")
@@ -135,6 +135,3 @@ def main():
 
     for kw in keyword_list:
         process_query(query=kw, max_results=args.max_results, base_dir=args.base_dir)
-
-if __name__ == "__main__":
-    main()

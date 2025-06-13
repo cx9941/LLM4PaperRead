@@ -22,18 +22,34 @@
         </div>
 
         <div class="content-area">
-            <div class="paper-list" id="paper-list">
+            <div class="paper-list-container" id="paper-list">
                 <!-- Papers will be populated here -->
-            </div>
-            <div class="paper-viewer">
-                <div class="pdf-viewer" id="pdf-viewer">
-                    <!-- PDF will be displayed here -->
-                    <p>Select a paper to view</p>
-                </div>
-                <div class="summary-viewer" id="summary-viewer">
-                    <!-- Markdown summary will be displayed here -->
-                    <p>Paper summary will appear here</p>
-                </div>
+                <template id="paper-template">
+                    <div class="paper-item">
+                        <div class="paper-header">
+                            <h3 class="paper-title"></h3>
+                            <div class="paper-meta">
+                                <div class="paper-meta-row">
+                                    <span class="paper-meta-label">作者：</span>
+                                    <span class="paper-meta-value authors"></span>
+                                </div>
+                                <div class="paper-meta-row">
+                                    <span class="paper-meta-label">发表：</span>
+                                    <span class="paper-meta-value publication"></span>
+                                </div>
+                                <div class="paper-meta-row">
+                                    <span class="paper-meta-label">日期：</span>
+                                    <span class="paper-meta-value date"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="paper-abstract"></div>
+                        <div class="paper-actions">
+                            <button class="read-paper">Read Paper</button>
+                            <button class="read-summary">Read Summary</button>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
     </div>

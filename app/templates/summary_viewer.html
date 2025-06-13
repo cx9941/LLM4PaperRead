@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}} | Paper Daily</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        .summary-viewer-container {
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .empty-summary {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/classic" class="back-link">← Back to Papers</a>
+            <h1>{{title}}</h1>
+        </header>
+
+        <div class="summary-viewer-container" id="summary-viewer">
+            {% if summary_content %}
+                <div id="markdown-content" data-content="{{ summary_content | escape }}"></div>
+            {% else %}
+                <p class="empty-summary">No summary available for this paper.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const contentDiv = document.getElementById('markdown-content');
+            if (contentDiv) {
+                const content = contentDiv.dataset.content;
+                if (content) {
+                    contentDiv.innerHTML = marked.parse(content);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -4,8 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const crawlBtn = document.getElementById('crawl-btn');
     const readBtn = document.getElementById('read-btn');
     const paperList = document.getElementById('paper-list');
-    const pdfViewer = document.getElementById('pdf-viewer');
-    const summaryViewer = document.getElementById('summary-viewer');
 
     // Search papers
     searchBtn.addEventListener('click', async () => {
@@ -51,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Read papers
     readBtn.addEventListener('click', async () => {
-        const selectedPapers = Array.from(document.querySelectorAll('.paper-item.selected'))
+        const selectedPapers = Array.from(document.querySelectorAll('.paper-item'))
             .map(el => ({
                 id: el.dataset.id,
                 title: el.dataset.title,
@@ -62,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }));
 
         if (selectedPapers.length === 0) {
-            alert('Please select at least one paper');
+            alert('Please search for papers first');
             return;
         }
 
@@ -83,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Display papers in list
+    // Display papers in list with full details
     function displayPapers(papers) {
         paperList.innerHTML = '';
         papers.forEach(paper => {
@@ -97,62 +95,44 @@ document.addEventListener('DOMContentLoaded', () => {
             paperEl.dataset.mdPath = paper.md_path;
 
             paperEl.innerHTML = `
-                <h3>${paper.title}</h3>
-                <p class="authors">${paper.authors.join(', ')}</p>
-                <p class="abstract">${paper.abstract.substring(0, 100)}...</p>
+                <div class="paper-header">
+                    <h3 class="paper-title">${paper.title}</h3>
+                    <div class="paper-meta">
+                        <div class="paper-meta-row">
+                            <span class="paper-meta-label">作者：</span>
+                            <span class="paper-meta-value authors">${paper.authors.slice(0, 3).join(', ')}${paper.authors.length > 3 ? ' et al.' : ''}</span>
+                        </div>
+                        <div class="paper-meta-row">
+                            <span class="paper-meta-label">发表：</span>
+                            <span class="paper-meta-value publication">${paper.venue || 'Unknown venue'}</span>
+                        </div>
+                        <div class="paper-meta-row">
+                            <span class="paper-meta-label">日期：</span>
+                            <span class="paper-meta-value date">${paper.publication_date ? new Date(paper.publication_date).getFullYear() : 'Unknown year'}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="paper-abstract">
+                    <p>${paper.abstract || 'No abstract available'}</p>
+                </div>
+                <div class="paper-actions">
+                    <button class="read-paper" data-id="${paper.id}">📄 阅读论文</button>
+                    <button class="read-summary" data-id="${paper.id}">📝 解析论文</button>
+                </div>
             `;
 
-            paperEl.addEventListener('click', () => {
-                document.querySelectorAll('.paper-item').forEach(el => el.classList.remove('selected'));
-                paperEl.classList.add('selected');
-                showPaper(paper.id);
+            // Add click handlers for buttons
+            paperEl.querySelector('.read-paper').addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.location.href = `/paper/arxiv/${paper.id}/pdf`;
+            });
+
+            paperEl.querySelector('.read-summary').addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.location.href = `/paper/arxiv/${paper.id}/summary`;
             });
 
             paperList.appendChild(paperEl);
         });
-    }
-
-    // Show paper in viewer
-    async function showPaper(paperId) {
-        // Show PDF
-        pdfViewer.innerHTML = `
-            <iframe src="/papers/arxiv/${paperId}/pdf" 
-                    width="100%" 
-                    height="100%" 
-                    style="border: none;"></iframe>
-        `;
-
-        // Show summary
-        try {
-            const response = await fetch(`/papers/arxiv/${paperId}/summary`);
-            if (response.ok) {
-                const markdown = await response.text();
-                // Initialize marked if not already loaded
-                if (typeof marked === 'undefined') {
-                    const script = document.createElement('script');
-                    script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
-                    script.onload = () => {
-                        summaryViewer.innerHTML = marked.parse(markdown);
-                    };
-                    document.head.appendChild(script);
-                } else {
-                    summaryViewer.innerHTML = marked.parse(markdown);
-                }
-            } else {
-                summaryViewer.innerHTML = '<p>No summary available yet. Click "Read Papers" to generate one.</p>';
-            }
-        } catch (error) {
-            summaryViewer.innerHTML = '<p>Error loading summary</p>';
-            console.error('Summary load failed:', error);
-        }
-
-        // Auto-refresh paper list every 30 seconds
-        if (!window.paperRefreshInterval) {
-            window.paperRefreshInterval = setInterval(() => {
-                if (searchInput.value.trim()) {
-                    searchBtn.click();
-                }
-            }, 30000);
-        }
     }
 });

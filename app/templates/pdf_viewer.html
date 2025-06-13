@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Viewer | Paper Daily</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        #pdf-viewer {
+            width: 100%;
+            height: 100vh;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <iframe id="pdf-viewer" src=""></iframe>
+
+    <script>
+        // Extract paper ID from URL
+        const pathParts = window.location.pathname.split('/');
+        const source = pathParts[2];
+        const paperId = pathParts[3];
+        
+        // Set PDF source
+        document.getElementById('pdf-viewer').src = `/papers/${source}/${paperId}/pdf`;
+    </script>
+</body>
+</html>

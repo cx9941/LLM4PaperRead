@@ -15,10 +15,10 @@ import requests
 from xml.etree import ElementTree as ET
 import re
 from urllib.parse import urljoin
+import nest_asyncio
 
 # 初始化 Marker 转换器
 converter = PdfConverter(artifact_dict=create_model_dict())
-sch = SemanticScholar()
 
 def safe_filename(text, max_length=100):
     return "".join(c if c.isalnum() or c in ("_", "-") else "_" for c in text[:max_length])
@@ -139,6 +139,15 @@ def fetch_url(result, pdf_filepath, md_filepath):
 
 
 def process_query(query, max_results, base_dir):
+    # Initialize SemanticScholar client inside function to avoid import-time loop patching
+    # try:
+    #     nest_asyncio.apply()
+    #     sch = SemanticScholar()
+    # except Exception as e:
+    #     print(f"Failed to initialize SemanticScholar client: {e}")
+    #     return
+
+    sch = SemanticScholar()
     query_time = datetime.now().strftime("%Y-%m-%d")
     pdf_dir = os.path.join(base_dir, "pdf_files")
     md_dir = os.path.join(base_dir, "markdown_files")
